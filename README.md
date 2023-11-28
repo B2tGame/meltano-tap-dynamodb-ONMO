@@ -23,6 +23,7 @@ Built with the [Meltano Singer SDK](https://sdk.meltano.com).
 | aws_access_key_id       | False    | None    | The access key for your AWS account. |
 | aws_secret_access_key   | False    | None    | The secret key for your AWS account. |
 | aws_session_token       | False    | None    | The session key for your AWS account. This is only needed when you are using temporary credentials. |
+| aws_session_duration    | False    |    3600 | The duration, in seconds, that the AWS session credentials should remain valid. |
 | aws_profile             | False    | None    | The AWS credentials profile name to use. The profile must be configured and accessible. |
 | aws_default_region      | False    | None    | The default AWS region name (e.g. us-east-1)  |
 | aws_endpoint_url        | False    | None    | The complete URL to use for the constructed client. |

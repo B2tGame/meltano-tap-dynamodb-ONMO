@@ -35,6 +35,14 @@ AWS_AUTH_CONFIG = th.PropertiesList(
         ),
     ),
     th.Property(
+        "aws_session_duration",
+        th.IntegerType,
+        description=(
+            "The duration, in seconds, that the AWS session credentials"
+            " should remain valid."
+        ),
+    ),
+    th.Property(
         "aws_profile",
         th.StringType,
         description=(
@@ -87,12 +95,14 @@ class AWSBotoConnector:
             self.aws_access_key_id = os.environ.get("AWS_ACCESS_KEY_ID")
             self.aws_secret_access_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
             self.aws_session_token = os.environ.get("AWS_SESSION_TOKEN")
+            self.aws_session_duration = os.environ.get("AWS_SESSION_DURATION")
             self.aws_profile = os.environ.get("AWS_PROFILE")
             self.aws_default_region = os.environ.get("AWS_DEFAULT_REGION")
         else:
             self.aws_access_key_id = config.get("aws_access_key_id")
             self.aws_secret_access_key = config.get("aws_secret_access_key")
             self.aws_session_token = config.get("aws_session_token")
+            self.aws_session_duration = config.get("aws_session_duration")
             self.aws_profile = config.get("aws_profile")
             self.aws_default_region = config.get("aws_default_region")
 
@@ -196,7 +206,10 @@ class AWSBotoConnector:
         if self.aws_assume_role_arn:
             if not session:
                 raise Exception("Insufficient inputs for AWS Auth.")
-            session = self._assume_role(session, self.aws_assume_role_arn)
+            if self.aws_session_duration:
+                session = self._assume_role(session, self.aws_assume_role_arn, self.aws_session_duration)
+            else:
+                session = self._assume_role(session, self.aws_assume_role_arn)
         return session
 
     def _factory(
@@ -239,12 +252,12 @@ class AWSBotoConnector:
         return self._factory(session.client, service_name)
 
     def _assume_role(
-        self, session: boto3.session.Session, role_arn: str
+        self, session: boto3.session.Session, role_arn: str, duration_seconds: int = 3600
     ) -> boto3.session.Session:
         # TODO: use for auto refresh https://github.com/benkehoe/aws-assume-role-lib
         sts_client = self.get_client(session, "sts")
         response = sts_client.assume_role(
-            RoleArn=role_arn, RoleSessionName="tap-dynamodb"
+            RoleArn=role_arn, RoleSessionName="tap-dynamodb", DurationSeconds=duration_seconds
         )
         return boto3.Session(
             aws_access_key_id=response["Credentials"]["AccessKeyId"],
