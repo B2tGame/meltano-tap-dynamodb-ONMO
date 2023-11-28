@@ -30,8 +30,8 @@ plugins:
       description: The session key for your AWS account. This is only needed when you
         are using temporary credentials.
       kind: password
-    - name: aws_session_duration
-      label: AWS Session Duration
+    - name: aws_session_token_duration
+      label: AWS Session Token Duration
       description: The duration, in seconds, that the AWS session credentials should remain valid.
       kind: integer
     - name: aws_profile

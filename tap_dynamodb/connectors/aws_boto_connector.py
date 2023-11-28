@@ -35,7 +35,7 @@ AWS_AUTH_CONFIG = th.PropertiesList(
         ),
     ),
     th.Property(
-        "aws_session_duration",
+        "aws_session_token_duration",
         th.IntegerType,
         description=(
             "The duration, in seconds, that the AWS session credentials"
@@ -95,14 +95,14 @@ class AWSBotoConnector:
             self.aws_access_key_id = os.environ.get("AWS_ACCESS_KEY_ID")
             self.aws_secret_access_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
             self.aws_session_token = os.environ.get("AWS_SESSION_TOKEN")
-            self.aws_session_duration = os.environ.get("AWS_SESSION_DURATION")
+            self.aws_session_token_duration = os.environ.get("AWS_SESSION_TOKEN_DURATION")
             self.aws_profile = os.environ.get("AWS_PROFILE")
             self.aws_default_region = os.environ.get("AWS_DEFAULT_REGION")
         else:
             self.aws_access_key_id = config.get("aws_access_key_id")
             self.aws_secret_access_key = config.get("aws_secret_access_key")
             self.aws_session_token = config.get("aws_session_token")
-            self.aws_session_duration = config.get("aws_session_duration")
+            self.aws_session_token_duration = config.get("aws_session_token_duration")
             self.aws_profile = config.get("aws_profile")
             self.aws_default_region = config.get("aws_default_region")
 
@@ -206,8 +206,8 @@ class AWSBotoConnector:
         if self.aws_assume_role_arn:
             if not session:
                 raise Exception("Insufficient inputs for AWS Auth.")
-            if self.aws_session_duration:
-                session = self._assume_role(session, self.aws_assume_role_arn, self.aws_session_duration)
+            if self.aws_session_token_duration:
+                session = self._assume_role(session, self.aws_assume_role_arn, self.aws_session_token_duration)
             else:
                 session = self._assume_role(session, self.aws_assume_role_arn)
         return session
